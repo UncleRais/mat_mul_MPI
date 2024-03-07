@@ -7,8 +7,9 @@
 int main(int argc, char** argv) {
 
 int rank, size, DRAGON_WARRIOR = 0;
+bool verbose = false;
 
-if (rank == DRAGON_WARRIOR) {
+if (rank == DRAGON_WARRIOR && verbose) {
 std::cout << "TBB version: " << TBB_runtime_version() << std::endl;
 };
 
@@ -98,8 +99,10 @@ std::cout << "Sum_{i,j}|D_block[i][j] - D_sequential[i][j]| = " <<  matrix_equal
 
 std::cout << "Initial / Optimized: " << times[0] / times[1] << std::endl;
 std::cout << "Initial / Block: " << times[0] / times[2] << std::endl;
-D_ref.save_to_txt("D_ref.txt");
-tmp_ref.save_to_txt("tmp_ref.txt");
+if (verbose) {
+  D_ref.save_to_txt("D_ref.txt");
+  tmp_ref.save_to_txt("tmp_ref.txt");
+};
 std::cout << "-----------------------------SEQUENTIAL-----------------------------" << std::endl;
 };
 
@@ -188,12 +191,15 @@ if (rank == DRAGON_WARRIOR) std::cout << "Initial / Block: " << times[0] / times
 
 MPI_Barrier(MPI_COMM_WORLD);
 
-mpi_timer_start();
-D.save_to_txt(std::string("D_") + std::to_string(rank) + std::string(".txt"));
-tmp.save_to_txt(std::string("tmp_") + std::to_string(rank) + std::string(".txt"));
-mpi_timer_stop();
+if (verbose) {
+  mpi_timer_start();
+  D.save_to_txt(std::string("D_") + std::to_string(rank) + std::string(".txt"));
+  tmp.save_to_txt(std::string("tmp_") + std::to_string(rank) + std::string(".txt"));
+  mpi_timer_stop();
+  std::cout << "[" << rank << "]: " << "Time of matrix writing = " << bench_timer_print() << std::endl;
+};
 
-std::cout << "[" << rank << "]: " << "Time of matrix writing = " << bench_timer_print() << std::endl;
+
 MPI_Barrier(MPI_COMM_WORLD);
 if (rank == DRAGON_WARRIOR) std::cout << "-----------------------------MPI-----------------------------" << std::endl;
 
